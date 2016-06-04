@@ -1,0 +1,77 @@
+syntax = "proto2";
+
+option java_multiple_files = true;
+option java_package = "";
+
+package yingshibao;
+
+service studyPlan {
+    // 应试宝2.0版本新增学习计划功能，学习计划包括四个阶段，每个阶段都有若干学习关卡
+    // 该接口根据用户选择分数范围以及考试类型，生成学习计划以及关卡数据的树形数据结构
+    // 接口数据均为json格式传输
+    // @method POST
+    // @title 用户获取学习计划
+    rpc getUserPlan(UserPlanCondition) returns (JsonResult) {}
+
+}
+
+message UserPlanCondition {
+    // 考试类型：1.CET4 2.CET6 3.考研 4.四六级 5.新概念 6.考研政治 7.考研数学 8.高考
+    required int32 examType = 1 [default = 1];
+
+    // 用户在学习计划中选择的目标分数
+    required int32 userChosenScore = 2 [default = 475];
+
+    // 用户单点登录的会话唯一标识
+    required string sessionId = 3 [default = "fa9960c1dbf746d288a0173cdbfc87a8"];
+}
+
+message JsonResult {
+    // 返回结果码： 0成功，非0失败
+    required int32 resultCode = 1 [default = 132665];
+
+    // 操作结果信息
+    required string resultMessage = 2 [default = "查询成功"];
+
+    // 返回的数据
+    required StageVo data = 3 ;
+}
+
+message StageVo {
+    // 客户端原先通过成功登录后从服务器获得的sessionId
+    repeated StudySchemeGroupVo schemeGroupList = 1 ;
+
+}
+
+message StudySchemeGroupVo {
+    // 客户端原先通过成功登录后从服务器获得的sessionId
+    repeated StudySchemeTaskVo schemeTaskList = 1 ;
+
+}
+
+message StudySchemeTaskVo {
+
+    // 关卡id
+    required int32 id = 1 [default = 132665];
+    
+    // 第几关
+    required int32 taskNumber = 2 [default = 5];
+
+    //该关卡是否有单词
+    required bool haveVocFlag = 3   [default = true];
+
+    // 客户端原先通过成功登录后从服务器获得的sessionId
+    repeated StudySchemePlanCourseVo roomList = 4 ;
+
+}
+
+
+message StudySchemePlanCourseVo {
+
+    // 教室id
+    required int32 courseRoomId = 1 [default = 132665];
+    
+    // 教室名称
+    required string courseRoomName = 2 [default = "四级阅读精讲第一节"];   
+
+}

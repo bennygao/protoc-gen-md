@@ -1,0 +1,110 @@
+syntax = "proto2";
+
+option java_multiple_files = true;
+option java_package = "protocol.http";
+
+package yingshibao;
+
+service user {
+    // 2.0中，不再强制要求用户首次进入应用时必须用手机号注册，直接让用户进入应用，这样没有用手机号正式注册过的用户称为游客用户，游客用户在应用中可以使用大部分功能，包括制订学习计划、自习等，当其要使用某些特定功能时，再提示用户需要注册。
+    // 服务器收到游客身份登陆请求时，创建一个新的userId，并自动创建一个session。
+    // @method POST
+	// @title 用户以游客身份登录
+    rpc guestLogin(LoginBase) returns (UserBase) {}
+
+    // 当用户从旧版本的客户端升级到2.0版本时，客户端把原先记录在用户手机存储中的sessionId发到服务器进行验证，验证通过后，客户端继续使用这个sessionId。这样可以避免用户从旧版本升级到2.0时重新输入用户名和密码验证，提升用户体验。
+    // 服务器端判断sessionId是否仍处于有效状态，并验证创建该session的用户手机号码与input参数中phone的值是否相同，都通过的话，返回成功标志给客户端。否则返回非0值，服务器可以根据错误类型，返回不同的非0值给客户端。
+    // @method POST
+    // @title session接续
+    rpc sessionContinuation(SessionContinuation) returns (ResponseBase) {}
+}
+
+
+/**********************************************************
+## deviceInfo
+deviceInfo用于存放应用在客户端能够读取到的所有手机设备参数信息。
+### android
+
+*	TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+*	telephonyManager.getDeviceId()
+*	telephonyManager.getDeviceSoftwareVersion()
+*	telephonyManager.getLine1Number()
+*	telephonyManager.getNetworkCountryIso()
+*	telephonyManager.getNetworkOperator()
+*	telephonyManager.getNetworkOperatorName()
+*	telephonyManager.getNetworkType()
+*	telephonyManager.getPhoneType()
+*	telephonyManager.getSimCountryIso()
+*	telephonyManager.getSimOperator()
+*	telephonyManager.getSimOperatorName()
+*	telephonyManager.getSimSerialNumber()
+*	telephonyManager.getSimState()
+*	telephonyManager.getSubscriberId()
+*	telephonyManager.getVoiceMailNumber()
+*	
+*	Build.BOARD // 主板
+*	Build.BRAND // android系统定制商
+*	Build.CPU_ABI // cpu指令集
+*	Build.DEVICE // 设备参数
+*	Build.DISPLAY // 显示屏参数
+*	Build.FINGERPRINT // 硬件名称
+*	Build.HOST
+*	Build.ID // 修订版本列表
+*	Build.MANUFACTURER // 硬件制造商
+*	Build.MODEL // 版本
+*	Build.PRODUCT // 手机制造商
+*	Build.TAGS // 描述build的标签
+*	Build.TIME
+*	Build.TYPE // builder类型
+*	Build.USER
+
+__android客户端在取得每个值得字符串后，应把其中的竖线[|]替换为减号[-]，双引号["]替换为单引号[']。__
+
+### iOS
+规则待定
+**********************************************************/
+message LoginBase {
+    // 手机IMEI串号
+    required string deviceId = 1 [default = "863531020110433"];
+
+    // 手机设备信息，能够读到的手机设备信息拼接成在一起，规则在[deviceInfo](#deviceInfo)描述。
+    required string deviceInfo = 2 [default = "DevicedId(IMEI)=352105066398679|DevicedSoftwareVersion=01|Line1Number=|NetworkCountryIso=cn|NetworkOperater=46000|NetwordOperaterName=CHINA MOBILE|NetworkType=2|phoneType=1|SimCountryIso=cn|SimOperater=46000|SimOperatorName=CMCC|SimSerialNumber=89860089261475289524|SimState=5|SubscribedId(IMSI)=460001883956379|VoiceMailNumber=|手机型号=SM-G9008W|sdk_int=19|android版本号=4.4.2|主板=MSM8974|系统定制商=samsung|cpu指令集=armeabi-v7a|设备参数=klte|显示屏参数=KOT49H.G9008WZMU1ANJ1|硬件名称=samsung/klteduoszm/klte:4.4.2/KOT49H/G9008WZMU1ANJ1:user/release-keys|HOST=SWDD6006|修订版本列表=KOT49H|硬件制造商=samsung|手机制造商=klteduoszm|描述build的标签=release-keys|Time=1412219786000|builder类型=user|User=dpi"];
+
+    // 客户端类型, android=1 iOS=2。
+    required int32 clientType = 3 [default = 1];
+
+    // 客户端版本号, 客户端版本的完整信息，例如"2.0"。
+    required string clientVersionCode = 4 [default = "2.0"];
+
+    // 分发渠道标识，客户端外放渠道打包时设置的channelId，用以标识360、百度、豌豆荚以及官网等。
+    // <br>__iOS版本当前统一设为AppStore__。
+    required string channelId = 5 [default = "360应用中心"];
+}
+
+message UserBase {
+    // 用户ID，服务器端生成的、每个用户唯一的标示ID。
+    required int32 userId = 1 [default = 132665];
+
+    // 服务器端创建的sessionId。
+    required string sessionId = 2 [default = "fa9960c1dbf746d288a0173cdbfc87a8"];
+
+    // 用户昵称，对于游客用户，初始昵称为“游客”+用户ID，例如“游客132665”。
+    required string nickName = 3 [default = "游客132665"];
+}
+
+message SessionContinuation {
+    // 客户端原先通过成功登录后从服务器获得的sessionId
+    required string sessionId = 1 [default = "fa9960c1dbf746d288a0173cdbfc87a8"];
+
+    // 手机号码，客户端原先从服务器获得并保存的用户手机号码。
+    required string phone = 2 [default = "13800138000"];
+}
+
+message ResponseBase {
+    // 0表示接续成功，非0值表示接续失败。
+    // <br>__接续失败时，客户端应自动转到【登录】UI让用户重新登录__。
+    required int32 flag = 1 [default = 0];
+
+    // 处理发生错误(flag!=0)时，存放导致错误的信息。
+    optional string errorMessage = 2 [default = ""];
+}

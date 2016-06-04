@@ -1,0 +1,4 @@
+#!/bin/sh
+
+script_dir=$(cd "$(dirname "$0")"; pwd)
+java -jar $script_dir/protoc-gen-md-1.0.jar $*

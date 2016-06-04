@@ -1,0 +1,201 @@
+syntax = "proto2";
+
+option java_multiple_files = true;
+option java_package = "l1.l2";
+
+package yingshibao;
+
+service studyPlan{
+    // 应试宝2.0版本用户获取每一关单词信息
+    // 接口数据均为json格式传输
+    // @method POST
+    // @title 根据关数id获取每一关单词信息和单词练习信息
+    rpc getVocByTaskId(UserPlanVocCondition) returns (JsonResult) {}
+	
+	//获取计划页课程信息
+	// 接口数据均为json格式传输
+    // @method POST
+    // @title 根据课程id获取课程信息
+	rpc getPlanRoomInfoByRoomId(coursePlanCondition) returns (JsonResult1){}
+
+
+}
+message coursePlanCondition{
+	//课程教室id
+	required int32 courseRoomId = 1 [default = 405];
+	
+	// 用户单点登录的会话唯一标识
+    required string sessionId = 2 [default = "fa9960c1dbf746d288a0173cdbfc87a8"];
+
+}
+
+message JsonResult1{
+	// 返回结果码： 0成功，非0失败
+    required int32 resultCode = 1 [default = 0];
+	
+    // 操作结果信息
+    required string resultMessage = 2 [default = "操作成功"];
+	
+	//教室信息
+	required CourseRoomBo date = 3;
+}
+
+message CourseRoomBo{
+	//教室id
+	required int32 id = 1 [default = 405];
+	//教室名称
+	required string roomTitle = 2 [default = "zxczxc"];
+	//视频录播课Url
+	required string videoUrl = 3 [default = "/qiniu/courseRoom/video/097EE570846692FE2ACB73549E2248F3.mp4"];
+	//视频长度
+	required string videoDuration = 4 [default = "5:9’7"];
+}
+
+message UserPlanVocCondition{
+	//关数id
+	required int32 taskId = 1 [default = 112];
+	
+	// 用户单点登录的会话唯一标识
+    required string sessionId = 2 [default = "fa9960c1dbf746d288a0173cdbfc87a8"];
+	
+}
+
+message JsonResult{
+	// 返回结果码： 0成功，非0失败
+    required int32 resultCode = 1 [default = 0];
+	
+    // 操作结果信息
+    required string resultMessage = 2 [default = "操作成功"];
+	
+	//每组单词的练习内容
+	repeated VocDetailPracticeVo vocPracticeList = 3;
+	
+	 // 返回的数据
+    repeated VocabularyDetail data = 4 ;
+	
+
+	
+}
+message VocabularyDetail{
+	// id
+	required int32 id = 1 [default = 3460];
+	//单词名称
+	required string name = 2 [default = "invisible"];
+	//单词翻译
+	required string meaning = 3 [default = "a. 看不见的、隐形的的"];
+	//单词音标
+	required string soundmark = 4 [default = "invizbl"];
+	//单词发音url
+	required string audioUrl = 5 [default = "/qiniu/studyRoom/voc/audio/invisible/E906B34A30711D9ADD024423D5811DFD.mp3"];
+	//单词类型
+	required int32 level = 6 [default = 1];
+	//单词搭配
+	required string phrase =7 [default = "invisible border"];
+	//考试频次
+	required int32 examTimes = 8 [default = 5];
+	//同义词
+	required string synonym = 9 [default = ""];
+	//反义词
+	required string antonym = 10 [default = ""];
+	//住记
+	required string mnemonic = 11 [default = ""];
+	//名词复数
+	required string plural = 12 [default = "1"];
+	//名词复数考试频次
+	required int32 pluralExamTimes = 13 [default = 1];
+	//动词过去式
+	required string beenhave = 14 [default = ""];
+	//动词过去式考试频次
+	required int32 beenhaveExamTimes = 15 [default = 1];
+	//过去分词
+	required string past = 16 [default = ""];
+	//过去式分词考试频次
+	required int32 pastExamTimes = 17 [default = 1];
+	//现在分词
+	required string now = 18 [default = ""];
+	//现在分词考试频次
+	required int32 nowExamTimes = 19 [default = 1];
+	//第三人称单数
+	required string singular = 20 [default = ""];
+	//第三人称单数考试频次
+	required int32 singularExamTimes = 21 [default = 1];
+	//副词
+	required string adverb = 22 [default = ""];
+	//副词考试频次
+	required int32 adverbExamTimes = 23 [default = 1];
+	//单词发音
+	required VocAudioExplain vocAudioExplainList = 24;
+	//单词图片
+	required VocabularyImg vocImgList = 25;
+	//单词例句
+	repeated VocabularySentence vocSentenceList = 26;
+}
+message VocAudioExplain {
+	//id
+	required int32 id = 1 [default = 3433];
+	//单词id 
+	required int32 vocabularyId = 2 [default = 3460];
+	//单词音频讲解
+	required string audioUrl = 3 [default = "/qiniu/studyRoom/voc/explain/invisible/3E16E7426F8EF4E8E19988C20EF967B0.mp3"];
+	//单词视频讲解
+	required string videoUrl = 4 [default = "/qiniu/studyRoom/voc/explain/invisible/3E16E7426F8EF4E8E19988C20EF967B0.mp4"];
+	//单词讲解长度
+	required string duration = 5 [default = ""];
+	//单词音频讲解文件大小
+	required string vocAudioSize = 6 [default = "10M"];
+	//单词讲解视频文件大小
+	required string vocVideoSize = 7 [default = "10M"];
+}
+message VocabularyImg{
+	//id
+	required int32 id = 1 [default = 3373];
+	//单词id
+	required int32 vocabularyId = 2 [default = 3460];
+	//单词图片url
+	required string imgUrl = 3 [default = "/qiniu/studyRoom/voc/img/invisible/54A07099A003506B23037B8A39347769.jpg"];
+}
+message VocabularySentence{
+	//id
+	required int32 id = 1 [default = 1];
+	//单词id
+	required int32 vocabularyId = 2 [default = 3460];
+	//例句内容
+	required string content = 3 [default = "AAAAThe report from the Bureau of Labor Statistics was just as gloomy as anticipated"];
+	//例句翻译
+	required string contentTrans = 4 [default = ""];
+	//例句音频
+	required string audioUrl = 5 [default = "/qiniu/studyRoom/sentence/audio/BC1F76C3243E87CDC7F08B60748D7212.mp3" ];
+	//例句视频
+	required string videoUrl = 6 [default = "/qiniu/studyRoom/sentence/audio/BC1F76C3243E87CDC7F08B60748D7212.mp4"];
+	//例句音频长度
+	required string duration = 7 [default = ""];
+	//例句音频讲解文件大小
+	required string sentenceAudioSize = 8 [default = "10M"];
+	//例句讲解视频文件大小
+	required string sentenceVideoSize = 9 [default = "10M"];
+	
+}
+message VocDetailPracticeVo{
+	//id
+	required int32 id = 1 [default = 1];
+	//单词id
+	required int32 vocId = 2 [default = 3460];
+	//单词名称
+	required string vocName = 3 [default = "invisible"];
+	//单词音标
+	required string soundmark = 4 [default = ""];
+	//单词发音
+	required string audioUrl = 5 [default = "/qiniu/studyRoom/sentence/audio/BC1F76C3243E87CDC7F08B60748D7212.mp3"];
+	//选项1 
+	required string option1 = 6 [default = "1"];
+	//选项2 
+	required string option2 = 7 [default = "2"];
+	//选项3 
+	required string option3 = 8 [default = "3"];
+	//选项4 
+	required string option4 = 9 [default = "4"];
+	//正确选项
+	required int32 rightOption = 10 [default = 1];
+
+}
+

@@ -1,0 +1,5 @@
+#!/bin/sh
+script_dir=$(cd "$(dirname "$0")"; pwd)
+outdir=$1
+shift 1
+PROTOC_GEN_MD_ARGS="$outdir" protoc --plugin=protoc-gen-md=$script_dir/protoc-gen-md --md_out=$outdir $*
